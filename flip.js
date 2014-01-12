@@ -70,7 +70,7 @@ var Boot = {
         this.Groupeobjs.forEach(function(item){
             
             if(item.y < item.r*that.dia){
-                item.y += 5
+                item.y = item.y + (item.r*that.dia - item.y) * 0.15
             }else{
                 item.y = item.r*that.dia
             }
@@ -84,7 +84,7 @@ var Boot = {
         f.alpha = 1
         this.select.add(f)
         this.lastselect = f
-        console.log(f.t)
+        //console.log(f.t)
     },
     funcOver: function(f){
        
@@ -103,7 +103,23 @@ var Boot = {
 //        console.log(b2)
 //        console.log(f.n)
         f.alpha = 1
+        
+//        var swapchild = null
+//        this.select.forEach(function(p){
+//            
+//            if(f.c == p.c && f.r < p.r){
+//                console.log('f.r  p.r'+f.r+':'+p.r)
+//                return (swapchild = p)
+//            }
+//            
+//        })
+        
+        
         this.select.add(f)
+        //swapchild && (this.select.swap(f, swapchild))
+        
+        
+        
         this.lastselect = f
         
     },
@@ -138,32 +154,28 @@ var Boot = {
         var pobj = this.select
         var plength = this.select.length
         
-        var hascol = -10
-        var addrow = -1
         
-        
+        this.select.sort('r')
+
+        var isadd = []
         this.select.forEach(function(p){
         
             var newc = p.c
+            var addrow = -1
+            isadd.forEach(function(cid){
+                if(newc == cid) addrow--
+            })
             
-            if(hascol == newc){              
-                addrow--  
-            }else{
-                addrow = -1
-            }
-            hascol = newc
-            
-            var flips  = that.addnewobj(newc*that.dia+30, -1*that.dia)
+            var flips  = that.addnewobj(newc*that.dia+30, addrow*that.dia)
             flips.r = addrow
             flips.c = p.c
-
-            that.Groupeobjs.add(flips)
             
+            isadd.push(p.c)
+            
+            that.Groupeobjs.add(flips)
+            //console.log(flips.c+ "\\\\" + flips.r)
         })
-        
 
-        that.select.sort('r')
-        
         this.Groupeobjs.forEach(function(item){
         
             that.select.forEach(function(p){
@@ -181,7 +193,10 @@ var Boot = {
             //console.log(item.r + '--'+item.c)
         })
         
-        
+        while(this.select.length > 0){
+            var item = this.select.getFirstAlive()
+            item.destroy()
+        }
         this.select.removeAll()
     
     
@@ -200,7 +215,9 @@ var Boot = {
         
         flips.events.onInputDown.add(this.funcDown, this)
         flips.events.onInputOver.add(this.funcOver, this)
-                
+           
+        //console.log(face)
+        
         return flips
     }
 //	,
